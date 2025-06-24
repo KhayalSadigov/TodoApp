@@ -1,0 +1,49 @@
+*{
+  box-sizing: border-box;
+}
+.container {
+  padding: 24px;
+  background: #f0f0f0;
+  height: 100vh;
+  overflow: hidden;
+  width: 100%;
+  width: 100vw;
+}
+
+.title {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 24px;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.column {
+  background: #cdcdcd;
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.task-card {
+  background: #fff;
+  border-left: 4px solid #d33;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+}
+
+.task-card h4 {
+  font-weight: bold;
+  margin-bottom: 4px;
+  color: black;
+}
+
+.task-card p {
+  font-size: 14px;
+  color: #444;
+}
