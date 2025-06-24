@@ -19,23 +19,14 @@ const setLocalTasks = (tasks: Task[]) => {
 
 const App: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [newTitle, setNewTitle] = useState("");
+  const [newDescription, setNewDescription] = useState("");
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const storedTasks = getLocalTasks();
-    if (storedTasks.length) {
+    if (storedTasks && storedTasks.length > 0) {
       setTasks(storedTasks);
-    } else {
-      const defaultTasks: Task[] = [
-        { id: 1, title: "Weather", description: "Check weather", status: "Todo" },
-        { id: 2, title: "Hotel", description: "Book Hotel", status: "Todo" },
-        { id: 3, title: "Medicine", description: "Buy medicines", status: "Todo" },
-        { id: 4, title: "Flights", description: "Book Flights for holiday", status: "Doing" },
-        { id: 5, title: "Insurance", description: "Buy Travel insurance", status: "Doing" },
-        { id: 6, title: "Taxi", description: "Book taxi to Airport", status: "Done" },
-        { id: 7, title: "Shopping", description: "Buy cloths for holiday", status: "Done" },
-      ];
-      setTasks(defaultTasks);
-      setLocalTasks(defaultTasks);
     }
   }, []);
 
@@ -45,6 +36,39 @@ const App: React.FC = () => {
 
   const columns: ("Todo" | "Doing" | "Done")[] = ["Todo", "Doing", "Done"];
 
+  const moveToNextStatus = (task: Task) => {
+    const nextStatus =
+      task.status === "Todo"
+        ? "Doing"
+        : task.status === "Doing"
+        ? "Done"
+        : null;
+    if (!nextStatus) return;
+    const updatedTasks = tasks.map((t) =>
+      t.id === task.id ? { ...t, status: nextStatus } : t
+    );
+    setTasks(updatedTasks);
+  };
+
+  const handleDeleteTask = (id: number) => {
+    const filtered = tasks.filter((task) => task.id !== id);
+    setTasks(filtered);
+  };
+
+  const handleAddTask = () => {
+    if (!newTitle.trim()) return;
+    const newTask: Task = {
+      id: Date.now(),
+      title: newTitle,
+      description: newDescription,
+      status: "Todo",
+    };
+    setTasks([...tasks, newTask]);
+    setNewTitle("");
+    setNewDescription("");
+    setShowModal(false);
+  };
+
   const renderTasks = (status: "Todo" | "Doing" | "Done") => {
     return tasks
       .filter((task) => task.status === status)
@@ -52,6 +76,22 @@ const App: React.FC = () => {
         <div key={task.id} className="task-card">
           <h4>{task.title}</h4>
           <p>{task.description}</p>
+          <div className="task-actions">
+            {task.status !== "Done" && (
+              <button
+                className="move-btn"
+                onClick={() => moveToNextStatus(task)}
+              >
+                {"-->"}
+              </button>
+            )}
+            <button
+              className="delete-btn"
+              onClick={() => handleDeleteTask(task.id)}
+            >
+              Delete
+            </button>
+          </div>
         </div>
       ));
   };
@@ -59,6 +99,35 @@ const App: React.FC = () => {
   return (
     <div className="container">
       <h1 className="title">Avengers</h1>
+
+      <button className="open-modal-btn" onClick={() => setShowModal(true)}>
+        + Add Task
+      </button>
+
+      {showModal && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h2>Add New Task</h2>
+            <input
+              type="text"
+              placeholder="Task title"
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder="Description"
+              value={newDescription}
+              onChange={(e) => setNewDescription(e.target.value)}
+            />
+            <div className="modal-actions">
+              <button onClick={handleAddTask}>Add</button>
+              <button onClick={() => setShowModal(false)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="board">
         {columns.map((column) => (
           <div key={column} className="column">
